@@ -8,6 +8,10 @@ using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Runtime.InteropServices;
+using AxShockwaveFlashObjects;
+using tessnet2;
+using System.Text;
+using System.Collections.Generic;
 
 namespace BtcClicksBot
 {
@@ -19,9 +23,11 @@ namespace BtcClicksBot
         }
 
         public WebControl webBrowser = new WebControl();
+        private List<Account> accList = new List<Account>();
+
         private const string regReq = "username={0}&password={1}&pconfirm={1}&email={2}&timezone=Europe%2FLondon&adcopy_response={3}&adcopy_challenge={4}&terms=on";
 
-        //username=mrpickles321&password=demon8891&pconfirm=demon8891&email=oduvanpolevoj%40mail.ru&timezone=Europe%2FLondon&adcopy_response=abelian+grape&adcopy_challenge=2%40K2I613-R5myEA75I4wvGOiR3VG372-zW%40USmQdNeoZagENU8bgrS7M39APTC4lJjo212aYQBOudlvotGS6b05p9rEcXfIVcPvjpXQv.lYI77XPgLCU1BwBfiPHe1yksmVU2mCpqsvhW7zdfOkldP7jnEFTmqLcJ3b5z8YF0.tlyctQFN7CSQcWlF7X2BCUVAAskKwN-WFF6lYiHBMeIE0MV4LZuAuLG.wpaugnPwpS41bQwklbgpafBDgCFL6asE.MYBt-Z6rnX4iX59zgMnRFTnOVzVs-2JfNz-kDMfruYDnUKLOaTvetnpUtbnYzK6dJkhFXIK0uoA&terms=on
+        //username=user&password=pass&pconfirm=pass&email=mail&timezone=Europe%2FLondon&adcopy_response=abelian+grape&adcopy_challenge=2%40K2I613-R5myEA75I4wvGOiR3VG372-zW%40USmQdNeoZagENU8bgrS7M39APTC4lJjo212aYQBOudlvotGS6b05p9rEcXfIVcPvjpXQv.lYI77XPgLCU1BwBfiPHe1yksmVU2mCpqsvhW7zdfOkldP7jnEFTmqLcJ3b5z8YF0.tlyctQFN7CSQcWlF7X2BCUVAAskKwN-WFF6lYiHBMeIE0MV4LZuAuLG.wpaugnPwpS41bQwklbgpafBDgCFL6asE.MYBt-Z6rnX4iX59zgMnRFTnOVzVs-2JfNz-kDMfruYDnUKLOaTvetnpUtbnYzK6dJkhFXIK0uoA&terms=on
         //{"result":"success","message":"You have successfully signed up. A confirmation email has been sent to your email address with a link to verify your email address.<br\/>\n        If you do not verify your email address within 7 days, your account will be deleted automatically."}
         //Referer	https://btcclicks.com/signup
         //https://btcclicks.com/ajax/signup
@@ -31,49 +37,30 @@ namespace BtcClicksBot
 
         private void RegForm_Load(object sender, EventArgs e)
         {
+            webBrowser.Width = 800;
+            webBrowser.Height = 1300;
             webBrowser.ViewType = WebViewType.Offscreen;
-            this.Controls.Add(webBrowser);
+            panel1.Controls.Add(webBrowser);
+
+            for (int i = 0; i < 10 ; i++)
+            {
+                accList.Add(new Account(RandomStr(), CreatePassword(8), "email@email.com"));
+            }
         }
 
-        public static void StartLoadImgTread(string imgUrl, PictureBox picbox)
+        private class Account
         {
-            if (imgUrl.Contains("http://"))
+            public Account(string username, string password, string email)
             {
-                ThreadStart threadStart = delegate() { loadImg(imgUrl, picbox, true, false); };
-                Thread pTh = new Thread(threadStart);
-                pTh.IsBackground = true;
-                pTh.Start();
+                this.Username = username;
+                this.Password = password;
+                this.Email = email;
             }
+
+            public string Username { set; get; }
+            public string Password { set; get; }
+            public string Email { set; get; }
         }
-
-        static public void loadImg(string imgurl, PictureBox picbox, bool drawtext, bool doWhite)
-        {
-            try
-            {
-
-                if (imgurl == string.Empty)
-                    return;
-
-                if (drawtext)
-                {
-                    picbox.Image = Properties.Resources.working;
-                }
-
-
-                WebClient wClient = new WebClient();
-                byte[] imageByte = wClient.DownloadData(imgurl);
-                using (MemoryStream ms = new MemoryStream(imageByte, 0, imageByte.Length))
-                {
-                    ms.Write(imageByte, 0, imageByte.Length);
-                    var resimg = Image.FromStream(ms, true);
-                    picbox.Image = resimg;
-                }
-            }
-            catch (Exception exc)
-            {
-            }
-        }
-
 
 
         private void button1_Click(object sender, EventArgs e)
@@ -84,15 +71,77 @@ namespace BtcClicksBot
           //  MessageBox.Show(webBrowser.ExecuteJavascriptWithResult(js));
 
 
-            webControl1.Source = regRef.ToUri();
+            webBrowser.Source = regRef.ToUri();
 
+            while (webBrowser.IsLoading)
+            {
+                Application.DoEvents();
+                Thread.Sleep(20);
+            };
+
+            string page = webBrowser.ExecuteJavascriptWithResult("document.getElementsByTagName('html')[0].innerHTML");
+
+            if (!page.Contains("application/x-shockwave"))
+            {
+                var surface = webBrowser.Surface as ImageSurface;
+                var captcha = Utils.cropImage(surface.Image, new Rectangle(44, 898, 300, 132));
+                pictureBox1.Image = captcha;
+               // surface.Image.Save("result.png");
+                textBox1.Text = DoTesseract(captcha);
+            }
+            else
+            {
+                MessageBox.Show("flash");
+                var imgLink = Regex.Match(page, "(?<=flash\" data=\")(.*)(?=\" style=\"width:100%)", RegexOptions.Singleline).ToString();
+                MessageBox.Show(imgLink);
+
+                WebClient wClient = new WebClient();
+                byte[] flashByte = wClient.DownloadData(imgLink);
+                InitFlashMovie(axShockwaveFlash1, flashByte);
+
+                while (axShockwaveFlash1.ReadyState != 4)
+                {
+                    Thread.Sleep(50);
+                    Application.DoEvents();
+                }
+
+
+                Application.DoEvents();
+                MessageBox.Show(axShockwaveFlash1.ReadyState.ToString());
+                Graphics g = axShockwaveFlash1.CreateGraphics();
+                Bitmap bmp = new Bitmap(axShockwaveFlash1.Size.Width, axShockwaveFlash1.Size.Height, g);
+                Graphics memoryGraphics = Graphics.FromImage(bmp);
+                IntPtr dc = memoryGraphics.GetHdc();
+                bool success = PrintWindow(axShockwaveFlash1.Handle, dc, 0);
+                memoryGraphics.ReleaseHdc(dc);
+                pictureBox1.Image = bmp;
+
+            }
 
             
         }
 
+        private static string DoTesseract(Image input)
+        {
+            var bmp = new Bitmap(input, new Size(100, 44));
+            var ocr = new Tesseract();
+            //ocr.SetVariable("tessedit_char_blacklist", "0123456789+-");
+            ocr.Init(null, "eng", false);
+            
+            var result = ocr.DoOCR(bmp, Rectangle.Empty);
+            string ret = string.Empty;
+ 
+            foreach (var item in result)
+            {
+                ret += item.Text + " ";
+            }
+
+            return ret.Trim();
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
-            dynamic document = (JSObject)webControl1.ExecuteJavascriptWithResult("document");
+            dynamic document = (JSObject)webBrowser.ExecuteJavascriptWithResult("document");
 
             using (document)
             {
@@ -108,17 +157,17 @@ namespace BtcClicksBot
                     switch (idStr)
                     {
                         case "inputUsername": 
-                            textbox[i].value = "govno";
+                            textbox[i].value = "randomName609884325";
                             break;
-                        case "inputEmail": 
-                            textbox[i].value = "email@govno.ru";
+                        case "inputEmail":
+                            textbox[i].value = "randomName609884325@gmail.com";
                             break;
                         case "inputPassword":
                         case "inputConfirm":
-                            textbox[i].value = "pass";
+                            textbox[i].value = "dfkgdfgdefgrer";
                             break;
                         case "adcopy_response":
-                            textbox[i].value = "answer";
+                            textbox[i].value = textBox1.Text;
                             break;
                        // case "inputTerms":
                        //     textbox[i].value = true;
@@ -128,24 +177,8 @@ namespace BtcClicksBot
 
                  }
 
-                string page = webControl1.ExecuteJavascriptWithResult("document.getElementsByTagName('html')[0].innerHTML");
-                if (!page.Contains("application/x-shockwave"))
-                {
-                    MessageBox.Show("Img");
-                    var imgLink = "http:"+ Regex.Match(page, "(?<=<iframe src=\")(.*)(?=\" height=\"150\" width=\"300\")", RegexOptions.Singleline).ToString();
-                    MessageBox.Show(imgLink);
-                    StartLoadImgTread(imgLink, pictureBox1);
-                }
-                else
-                {
-                    MessageBox.Show("flash");
-                    var imgLink = Regex.Match(page, "(?<=flash\" data=\")(.*)(?=\" style=\"width:100%)", RegexOptions.Singleline).ToString();
-                    MessageBox.Show(imgLink);
-                    axShockwaveFlash1.Movie = imgLink;
-                }
 
-               
-               webControl1.ExecuteJavascriptWithResult("document.getElementById(\"inputTerms\").checked = true;");
+                webBrowser.ExecuteJavascriptWithResult("document.getElementById(\"inputTerms\").checked = true;");
                 
 
                var btn = document.getElementsByTagName("button");
@@ -160,27 +193,59 @@ namespace BtcClicksBot
                 }
                   
             }
+
+        }
+
+
+
+        private void InitFlashMovie(AxShockwaveFlash flashObj, byte[] swfFile)
+        {
+            using (MemoryStream stm = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stm))
+                {
+                    /* Write length of stream for AxHost.State */
+                    writer.Write(8 + swfFile.Length);
+                    /* Write Flash magic 'fUfU' */
+                    writer.Write(0x55665566);
+                    /* Length of swf file */
+                    writer.Write(swfFile.Length);
+                    writer.Write(swfFile);
+                    stm.Seek(0, SeekOrigin.Begin);
+                    /* 1 == IPeristStreamInit */
+                    flashObj.OcxState = new AxHost.State(stm, 1, false, null);
+                }
+            }
         }
 
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool PrintWindow(IntPtr hwnd, IntPtr hDC, uint nFlags);
 
-        private void axShockwaveFlash1_OnReadyStateChange(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_OnReadyStateChangeEvent e)
-        {
 
-            MessageBox.Show( e.newState.ToString());
-            return;
-           
-            Graphics g = axShockwaveFlash1.CreateGraphics();
-            Bitmap bmp = new Bitmap(axShockwaveFlash1.Size.Width, axShockwaveFlash1.Size.Height, g);
-            Graphics memoryGraphics = Graphics.FromImage(bmp);
-            IntPtr dc = memoryGraphics.GetHdc();
-            bool success = PrintWindow(axShockwaveFlash1.Handle, dc, 0);
-            memoryGraphics.ReleaseHdc(dc);
-            pictureBox1.Image = bmp;
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //var surface = webBrowser.Surface as ImageSurface;
+          //  surface.Image.Save("result2.png");
         }
 
-     
+        public static string RandomStr()
+        {
+            string rStr = Path.GetRandomFileName();
+            rStr = rStr.Replace(".", ""); // For Removing the .
+            return rStr;
+        }
+
+        public string CreatePassword(int length)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!#%&*+";
+            StringBuilder res = new StringBuilder();
+            Random rnd = new Random();
+            while (0 < length--)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+            }
+            return res.ToString();
+        }
     }
 }

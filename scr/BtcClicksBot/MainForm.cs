@@ -115,8 +115,10 @@ namespace BtcClicksBot
         {
             try
             {
-                //WebCore.Initialize(new WebConfig(), true);
+                WebCore.Initialize(new WebConfig(), true);
                 WebCore.ResourceInterceptor = new CustomInterceptor();
+
+               // regFrm = new RegForm();
 
                 LoadSettings();
                 if (accListView.Items.Count != 0)

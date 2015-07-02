@@ -36,11 +36,15 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.ImageLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.proxyComboBox = new System.Windows.Forms.ComboBox();
             this.btcAddressBox = new System.Windows.Forms.TextBox();
+            this.RemAccButton = new System.Windows.Forms.Button();
+            this.EditAccButton = new System.Windows.Forms.Button();
+            this.addAccButton = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -55,6 +59,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,19 +73,14 @@
             this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.button4 = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.RemAccButton = new System.Windows.Forms.Button();
-            this.EditAccButton = new System.Windows.Forms.Button();
-            this.addAccButton = new System.Windows.Forms.Button();
-            this.ImageLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.runBotButton = new System.Windows.Forms.Button();
             this.loginButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // adsListView
@@ -136,6 +136,12 @@
             this.statusStrip1.TabIndex = 19;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // ImageLabel
+            // 
+            this.ImageLabel.Image = global::BtcClicksBot.Properties.Resources.ready;
+            this.ImageLabel.Name = "ImageLabel";
+            this.ImageLabel.Size = new System.Drawing.Size(16, 17);
+            // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
@@ -187,6 +193,36 @@
             this.btcAddressBox.Name = "btcAddressBox";
             this.btcAddressBox.Size = new System.Drawing.Size(100, 20);
             this.btcAddressBox.TabIndex = 28;
+            // 
+            // RemAccButton
+            // 
+            this.RemAccButton.Image = global::BtcClicksBot.Properties.Resources.cancel;
+            this.RemAccButton.Location = new System.Drawing.Point(76, 185);
+            this.RemAccButton.Name = "RemAccButton";
+            this.RemAccButton.Size = new System.Drawing.Size(30, 25);
+            this.RemAccButton.TabIndex = 25;
+            this.RemAccButton.UseVisualStyleBackColor = true;
+            this.RemAccButton.Click += new System.EventHandler(this.RemAccButton_Click);
+            // 
+            // EditAccButton
+            // 
+            this.EditAccButton.Image = global::BtcClicksBot.Properties.Resources.edit;
+            this.EditAccButton.Location = new System.Drawing.Point(42, 185);
+            this.EditAccButton.Name = "EditAccButton";
+            this.EditAccButton.Size = new System.Drawing.Size(30, 25);
+            this.EditAccButton.TabIndex = 25;
+            this.EditAccButton.UseVisualStyleBackColor = true;
+            this.EditAccButton.Click += new System.EventHandler(this.EditAccButton_Click);
+            // 
+            // addAccButton
+            // 
+            this.addAccButton.Image = global::BtcClicksBot.Properties.Resources.add;
+            this.addAccButton.Location = new System.Drawing.Point(6, 185);
+            this.addAccButton.Name = "addAccButton";
+            this.addAccButton.Size = new System.Drawing.Size(30, 25);
+            this.addAccButton.TabIndex = 25;
+            this.addAccButton.UseVisualStyleBackColor = true;
+            this.addAccButton.Click += new System.EventHandler(this.addAccButton_Click);
             // 
             // label11
             // 
@@ -323,6 +359,16 @@
             this.label2.TabIndex = 22;
             this.label2.Text = "None";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBox1.Location = new System.Drawing.Point(9, 20);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(90, 40);
+            this.pictureBox1.TabIndex = 10;
+            this.pictureBox1.TabStop = false;
+            // 
             // notifyIcon1
             // 
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
@@ -423,52 +469,6 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(9, 20);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(90, 40);
-            this.pictureBox1.TabIndex = 10;
-            this.pictureBox1.TabStop = false;
-            // 
-            // RemAccButton
-            // 
-            this.RemAccButton.Image = global::BtcClicksBot.Properties.Resources.cancel;
-            this.RemAccButton.Location = new System.Drawing.Point(76, 185);
-            this.RemAccButton.Name = "RemAccButton";
-            this.RemAccButton.Size = new System.Drawing.Size(30, 25);
-            this.RemAccButton.TabIndex = 25;
-            this.RemAccButton.UseVisualStyleBackColor = true;
-            this.RemAccButton.Click += new System.EventHandler(this.RemAccButton_Click);
-            // 
-            // EditAccButton
-            // 
-            this.EditAccButton.Image = global::BtcClicksBot.Properties.Resources.edit;
-            this.EditAccButton.Location = new System.Drawing.Point(42, 185);
-            this.EditAccButton.Name = "EditAccButton";
-            this.EditAccButton.Size = new System.Drawing.Size(30, 25);
-            this.EditAccButton.TabIndex = 25;
-            this.EditAccButton.UseVisualStyleBackColor = true;
-            this.EditAccButton.Click += new System.EventHandler(this.EditAccButton_Click);
-            // 
-            // addAccButton
-            // 
-            this.addAccButton.Image = global::BtcClicksBot.Properties.Resources.add;
-            this.addAccButton.Location = new System.Drawing.Point(6, 185);
-            this.addAccButton.Name = "addAccButton";
-            this.addAccButton.Size = new System.Drawing.Size(30, 25);
-            this.addAccButton.TabIndex = 25;
-            this.addAccButton.UseVisualStyleBackColor = true;
-            this.addAccButton.Click += new System.EventHandler(this.addAccButton_Click);
-            // 
-            // ImageLabel
-            // 
-            this.ImageLabel.Image = global::BtcClicksBot.Properties.Resources.ready;
-            this.ImageLabel.Name = "ImageLabel";
-            this.ImageLabel.Size = new System.Drawing.Size(16, 16);
-            // 
             // runBotButton
             // 
             this.runBotButton.Image = global::BtcClicksBot.Properties.Resources.start;
@@ -497,11 +497,11 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(21, 365);
+            this.button1.Location = new System.Drawing.Point(23, 364);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(75, 52);
             this.button1.TabIndex = 27;
-            this.button1.Text = "button1";
+            this.button1.Text = "Register Acc (Test)";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_1);
             // 
@@ -533,8 +533,8 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.contextMenuStrip1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
